@@ -7,7 +7,7 @@
     <meta name="description" content="Pagsmile Docs for Developers">
     
     
-    <link rel="preload" href="/assets/css/0.styles.b4b7b21d.css" as="style"><link rel="preload" href="/assets/js/app.d0db694d.js" as="script"><link rel="preload" href="/assets/js/2.d39b8363.js" as="script"><link rel="preload" href="/assets/js/22.609b25e4.js" as="script"><link rel="prefetch" href="/assets/js/10.f381f1ca.js"><link rel="prefetch" href="/assets/js/11.637124c6.js"><link rel="prefetch" href="/assets/js/12.078a444e.js"><link rel="prefetch" href="/assets/js/13.8241a987.js"><link rel="prefetch" href="/assets/js/14.f8ea04e6.js"><link rel="prefetch" href="/assets/js/15.14b1f440.js"><link rel="prefetch" href="/assets/js/16.d5e8acd6.js"><link rel="prefetch" href="/assets/js/17.0a1fc2f2.js"><link rel="prefetch" href="/assets/js/18.e79db3ac.js"><link rel="prefetch" href="/assets/js/19.75734e09.js"><link rel="prefetch" href="/assets/js/20.9a6ab2b9.js"><link rel="prefetch" href="/assets/js/21.e715ced9.js"><link rel="prefetch" href="/assets/js/23.fda6ab8d.js"><link rel="prefetch" href="/assets/js/24.c2308eb3.js"><link rel="prefetch" href="/assets/js/25.2ad10789.js"><link rel="prefetch" href="/assets/js/26.bcf0b57e.js"><link rel="prefetch" href="/assets/js/27.87c9010a.js"><link rel="prefetch" href="/assets/js/3.b0b81d78.js"><link rel="prefetch" href="/assets/js/4.c54993a3.js"><link rel="prefetch" href="/assets/js/5.146b65c1.js"><link rel="prefetch" href="/assets/js/6.aeddfab3.js"><link rel="prefetch" href="/assets/js/7.87c63034.js"><link rel="prefetch" href="/assets/js/8.9f1cb44f.js"><link rel="prefetch" href="/assets/js/9.ef4101f9.js">
+    <link rel="preload" href="/assets/css/0.styles.b4b7b21d.css" as="style"><link rel="preload" href="/assets/js/app.b8e94a89.js" as="script"><link rel="preload" href="/assets/js/2.10bbd2e4.js" as="script"><link rel="preload" href="/assets/js/23.26c8a696.js" as="script"><link rel="prefetch" href="/assets/js/10.026c377d.js"><link rel="prefetch" href="/assets/js/11.2a0c2e5f.js"><link rel="prefetch" href="/assets/js/12.b51e0244.js"><link rel="prefetch" href="/assets/js/13.16c93a27.js"><link rel="prefetch" href="/assets/js/14.98344f03.js"><link rel="prefetch" href="/assets/js/15.f9b51c84.js"><link rel="prefetch" href="/assets/js/16.2413f1cd.js"><link rel="prefetch" href="/assets/js/17.c5811065.js"><link rel="prefetch" href="/assets/js/18.2f7ef2a5.js"><link rel="prefetch" href="/assets/js/19.fddf76a8.js"><link rel="prefetch" href="/assets/js/20.8a954932.js"><link rel="prefetch" href="/assets/js/21.414ce04c.js"><link rel="prefetch" href="/assets/js/22.b110f271.js"><link rel="prefetch" href="/assets/js/24.86f908e3.js"><link rel="prefetch" href="/assets/js/25.ffa0f884.js"><link rel="prefetch" href="/assets/js/26.be680d68.js"><link rel="prefetch" href="/assets/js/27.87c9010a.js"><link rel="prefetch" href="/assets/js/3.f56c4fd4.js"><link rel="prefetch" href="/assets/js/4.1fe1489f.js"><link rel="prefetch" href="/assets/js/5.223994e3.js"><link rel="prefetch" href="/assets/js/6.60fbcfd7.js"><link rel="prefetch" href="/assets/js/7.9cf40f4c.js"><link rel="prefetch" href="/assets/js/8.af611884.js"><link rel="prefetch" href="/assets/js/9.e1f92abf.js">
     <link rel="stylesheet" href="/assets/css/0.styles.b4b7b21d.css">
   </head>
   <body>
@@ -33,7 +33,65 @@ allprojects {
 }
 mavenCentral()
 maven { url 'https://jitpack.io' }
-</code></pre></div><h3 id="_3-在app的build-gradle中添加配置："><a href="#_3-在app的build-gradle中添加配置：" class="header-anchor">#</a> 3. 在app的build.gradle中添加配置：</h3> <div class="language- extra-class"><pre class="language-text"><code></code></pre></div><h3 id="_4-androidmanifest-xml"><a href="#_4-androidmanifest-xml" class="header-anchor">#</a> 4. AndroidManifest.xml</h3> <p>如果没有自己的application文件，在AndroidManifest.xml文件的application标签中添加属性：</p> <div class="language- extra-class"><pre class="language-text"><code>android:name=&quot;com.pagsmile.sdk.PagsmileApplication&quot;
+</code></pre></div><h3 id="_3-在app的build-gradle中添加配置："><a href="#_3-在app的build-gradle中添加配置：" class="header-anchor">#</a> 3. 在app的build.gradle中添加配置：</h3> <div class="language- extra-class"><pre class="language-text"><code>android {
+  ...
+  defaultConfig {
+    multiDexEnabled true
+    ndk {
+      abiFilters &quot;armeabi-v7a&quot;, &quot;x86&quot;
+    }
+  }
+  packagingOptions {
+      exclude &quot;lib/arm64-v8a/librealm-jni.so&quot;
+      pickFirst 'lib/x86/libc++_shared.so'
+      pickFirst 'lib/arm64-v8a/libc++_shared.so'
+      pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+      pickFirst 'lib/x86_64/libc++_shared.so'
+  }
+  repositories {
+      flatDir {
+          dirs 'libs'
+      }
+  }
+  ...
+}
+
+dependencies {
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+  implementation 'androidx.appcompat:appcompat:1.1.0'
+  implementation 'com.android.support:multidex:2.0.3'
+
+  implementation(name: 'livechat', ext: 'aar')
+  implementation(name: 'react-native-0.61.2', ext: 'aar')
+  implementation(name: 'react-native-i18n', ext: 'aar')
+  implementation(name: 'react-native-pdf', ext: 'aar')
+  implementation(name: 'react-native-vector-icons', ext: 'aar')
+  implementation(name: 'rn-fetch-blob', ext: 'aar')
+  implementation(name: 'pagsmile-1.0.0', ext: 'aar')
+  debugImplementation(name: 'hermes-debug', ext: 'aar')
+  releaseImplementation(name: 'hermes-release', ext: 'aar')
+
+  implementation 'com.google.code.gson:gson:2.8.5'
+  implementation 'com.android.volley:volley:1.1.1'
+  implementation 'com.github.barteksc:android-pdf-viewer:3.1.0-beta.1'
+
+  implementation 'com.alibaba:fastjson:1.2.41'
+  implementation 'com.facebook.android:facebook-messenger:5.+'
+  implementation 'com.facebook.android:facebook-share:5.+'
+  implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0'
+
+  implementation 'com.facebook.infer.annotation:infer-annotation:0.11.2'
+  implementation 'javax.inject:javax.inject:1'
+  implementation 'com.facebook.fresco:fresco:1.10.0'
+  implementation 'com.facebook.fresco:imagepipeline-okhttp3:1.10.0'
+  implementation 'com.facebook.soloader:soloader:0.6.0'
+  implementation 'com.google.code.findbugs:jsr305:3.0.2'
+  implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+  implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.12.1'
+  implementation 'com.squareup.okio:okio:1.15.0'
+}
+</code></pre></div><h3 id="_4-androidmanifest-xml"><a href="#_4-androidmanifest-xml" class="header-anchor">#</a> 4. AndroidManifest.xml</h3> <p>如果没有自己的application文件，在AndroidManifest.xml文件的application标签中添加属性：</p> <div class="language- extra-class"><pre class="language-text"><code>android:name=&quot;com.pagsmile.sdk.PagsmileApplication&quot;
 </code></pre></div><p>如果有自己的application文件，添加如下代码：</p> <div class="language- extra-class"><pre class="language-text"><code>@Override
 protected void attachBaseContext(Context base) {
   super.attachBaseContext(base);
@@ -46,6 +104,6 @@ protected void attachBaseContext(Context base) {
       <a href="/en/reference/sdk-overview.html" class="prev">Overview</a></span> <span class="next"><a href="/en/reference/ios.html">SDK iOS</a>
       →
     </span></p></div> </main></div><div class="global-ui"></div></div>
-    <script src="/assets/js/app.d0db694d.js" defer></script><script src="/assets/js/2.d39b8363.js" defer></script><script src="/assets/js/22.609b25e4.js" defer></script>
+    <script src="/assets/js/app.b8e94a89.js" defer></script><script src="/assets/js/2.10bbd2e4.js" defer></script><script src="/assets/js/23.26c8a696.js" defer></script>
   </body>
 </html>
